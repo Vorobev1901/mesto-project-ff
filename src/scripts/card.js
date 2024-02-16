@@ -1,7 +1,14 @@
+// Функция клонирования шаблона
+
+function getCardTemplate(template) {
+  const card = template.querySelector(".card").cloneNode(true);
+  return card;
+}
+
 // Функция создания карточки
 
-function createCard(cardTemplate, cardData, deleteCard, addLike, openPopupImg) {
-  const card = cardTemplate.querySelector(".card").cloneNode(true);
+function createCard(template, cardData, deleteCard, addLike, openPopupImg) {
+  const card = getCardTemplate(template);
   const cardImage = card.querySelector(".card__image");
   const cardTitle = card.querySelector(".card__title");
   const buttonDelete = card.querySelector(".card__delete-button");
@@ -24,8 +31,8 @@ const deleteCard = (card) => {
 
 // Функция обработчика "лайка"
 
-const addLike = (likeBtn) => {
+const toggleLike = (likeBtn) => {
   likeBtn.classList.toggle("card__like-button_is-active");
 };
 
-export { createCard, deleteCard, addLike };
+export { createCard, deleteCard, toggleLike };
