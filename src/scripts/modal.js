@@ -34,6 +34,10 @@ function openPopup(popup) {
 // Функция закрытия модального окна
 
 function closePopup(popup) {
+  if(popup.closest('.popup_type_new-card')) {
+    const formElement = popup.querySelector('.popup__form');
+    formElement.reset();
+  }
   popup.classList.remove("popup_is-opened");
   popup.removeEventListener("click", clickOutsidePopup);
   popup.removeEventListener("click", closeBtn);
