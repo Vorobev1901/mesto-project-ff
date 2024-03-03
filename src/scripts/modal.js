@@ -1,8 +1,8 @@
 // Закрытие по нажатию на close, esc, вне формы.
 
 function closeBtn(evt) {
-  if (evt.target.className == "popup__close") {
-    const popup = document.querySelector(".popup.popup_is-opened");
+  if (evt.target.className == 'popup__close') {
+    const popup = document.querySelector('.popup.popup_is-opened');
     closePopup(popup);
   }
 }
@@ -10,14 +10,14 @@ function closeBtn(evt) {
 function clickEsc(evt) {
   const escKey = 27;
   if (evt.keyCode === escKey) {
-    const popup = document.querySelector(".popup.popup_is-opened");
+    const popup = document.querySelector('.popup.popup_is-opened');
     closePopup(popup);
   }
 }
 
 function clickOutsidePopup(evt) {
-  if (!evt.target.closest(".popup__content")) {
-    const popup = evt.target.closest(".popup.popup_is-opened");
+  if (!evt.target.closest('.popup__content')) {
+    const popup = evt.target.closest('.popup.popup_is-opened');
     closePopup(popup);
   }
 }
@@ -25,23 +25,23 @@ function clickOutsidePopup(evt) {
 // Функция октрытия модального окна
 
 function openPopup(popup) {
-  popup.classList.add("popup_is-opened");
-  popup.addEventListener("click", clickOutsidePopup);
-  popup.addEventListener("click", closeBtn);
-  document.addEventListener("keydown", clickEsc);
+  popup.classList.add('popup_is-opened');
+  popup.addEventListener('mousedown', clickOutsidePopup);
+  popup.addEventListener('click', closeBtn);
+  document.addEventListener('keydown', clickEsc);
 }
 
 // Функция закрытия модального окна
 
 function closePopup(popup) {
-  if(popup.closest('.popup_type_new-card')) {
+  if (popup.closest('.popup_type_new-card') || popup.closest('.popup_type_edit_avatar')) {
     const formElement = popup.querySelector('.popup__form');
     formElement.reset();
   }
-  popup.classList.remove("popup_is-opened");
-  popup.removeEventListener("click", clickOutsidePopup);
-  popup.removeEventListener("click", closeBtn);
-  document.removeEventListener("keydown", clickEsc);
+  popup.classList.remove('popup_is-opened');
+  popup.removeEventListener('mousedown', clickOutsidePopup);
+  popup.removeEventListener('click', closeBtn);
+  document.removeEventListener('keydown', clickEsc);
 }
 
 export { closePopup, openPopup };
