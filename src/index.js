@@ -1,9 +1,9 @@
 import './pages/index.css';
-import { createCard, toggleLike, deleteCard } from './scripts/card.js';
+import { createCard, deleteCard, changeLike } from './scripts/card.js';
 import { closePopup, openPopup } from './scripts/modal.js';
-import { renderSaveLoading, renderCreateLoading, renderDeleteLoading } from './scripts/loading.js';
+import { renderLoading } from './scripts/loading.js';
 import { enableValidation, clearValidation } from './scripts/validation.js';
-import { getInitialCards, getUser, editUser, addCard, deleteCardById, addLikeById, deleteLikeById, editAvatar } from './scripts/api.js';
+import { getInitialCards, getUser, editUser, addCard, deleteCardById, putLikeCard, deleteLikeCard, editAvatar } from './scripts/api.js';
 
 // Темплейт и контейнер для карточки
 
@@ -61,7 +61,7 @@ const validationEnableConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
+  inactiveButtonClass: 'popup__button_inactive',
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__input-error_visible',
 };
@@ -69,10 +69,16 @@ const validationEnableConfig = {
 const validationClearConfig = {
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
+  inactiveButtonClass: 'popup__button_inactive',
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__input-error_visible',
 };
+
+// Переменные с id пользователем и id выбранной карточки
+
+let userId = '';
+let currentCardId = '';
+let cardElement = null;
 
 // Получение карточек и пользователя, вывод их на страницу
 
@@ -80,14 +86,15 @@ Promise.all([getInitialCards(), getUser()])
   .then((data) => {
     const cards = data[0];
     const user = data[1];
+    userId = user._id;
     renderUser(user);
-    renderCards(cardTemplate, cards, createCard, user._id);
+    renderCards(cardTemplate, cards, createCard);
   })
   .catch((err) => {
-    console.log(err);
+    console.log(`Ошибка: ${err}`);
   })
   .finally(() => {
-    console.log('ok');
+    console.log('Загрузка данных завершена.');
   });
 
 // Инициализация полей формы
@@ -100,9 +107,9 @@ const renderUser = (user) => {
 
 // Функция вывода карточек
 
-const renderCards = (template, cards, createCard, userId) => {
+const renderCards = (template, cards, createCard) => {
   cards.forEach((card) => {
-    const newCard = createCard(template, card, toggleLike, handlePopupTypeImage, userId, addLikeById, deleteLikeById, handlePopupTypeDeleteCard);
+    const newCard = createCard(template, card, handlePopupTypeImage, userId, handleLikeCard, handlePopupTypeDeleteCard);
     cardsContainer.append(newCard);
   });
 };
@@ -131,20 +138,20 @@ profileImage.addEventListener('click', () => {
 const handleFormDeleteCardSubmit = (evt) => {
   evt.preventDefault();
   const formBtn = formDeleteCard.querySelector('.popup__button');
-  const currentCardId = formBtn.dataset.currentId;
-  const card = document.querySelector(`[data-card-id="${currentCardId}"]`);
-  renderDeleteLoading(true, formBtn);
+  renderLoading(formBtn, 'Удаление...');
   deleteCardById(currentCardId)
     .then(() => {
       closePopup(popupTypeDeleteCard);
       formDeleteCard.removeEventListener('submit', handleFormDeleteCardSubmit);
-      deleteCard(card);
+      deleteCard(cardElement);
+      currentCardId = '';
+      cardElement = null;
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      renderDeleteLoading(false, formBtn);
+      renderLoading(formBtn, 'Да');
     });
 };
 
@@ -156,7 +163,7 @@ function handleFormEditProfileSubmit(evt) {
     about: jobInput.value,
   };
   // Запрос на изменение профиля пользователя
-  renderSaveLoading(true, btnSave);
+  renderLoading(btnSave, 'Сохранение...');
   editUser(user)
     .then((data) => {
       profileTitle.textContent = data.name;
@@ -166,7 +173,7 @@ function handleFormEditProfileSubmit(evt) {
       console.log(err);
     })
     .finally(() => {
-      renderSaveLoading(false, btnSave);
+      renderLoading(btnSave, 'Сохранить');
       closePopup(popupTypeEditProfile);
     });
 }
@@ -182,19 +189,18 @@ function handleFormNewCardSubmit(evt) {
     likes: [],
   };
   // Запрос на создание новой карточки
-  renderCreateLoading(true, btnCreate);
-  Promise.all([addCard(card), getUser()])
+  renderLoading(btnCreate, 'Создание...');
+  addCard(card)
     .then((data) => {
-      const card = data[0];
-      const user = data[1];
-      const newCard = createCard(cardTemplate, card, toggleLike, handlePopupTypeImage, user._id, addLikeById, deleteLikeById, handlePopupTypeDeleteCard);
+      const card = data;
+      const newCard = createCard(cardTemplate, card, handlePopupTypeImage, userId, handleLikeCard, handlePopupTypeDeleteCard);
       cardsContainer.prepend(newCard);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      renderCreateLoading(false, btnCreate);
+      renderLoading(btnCreate, 'Создать');
       formNewCard.reset();
       closePopup(popupTypeNewCard);
     });
@@ -204,18 +210,18 @@ function handleFormEditAvatarSubmit(evt) {
   evt.preventDefault();
   const avatar = avatarInput.value;
   const btnSave = popupTypEditAvatar.querySelector('.popup__button');
-  profileImage.setAttribute('style', `background-image: url('${avatar}');`);
   // Запрос на изменение профиля пользователя
-  renderSaveLoading(true, btnSave);
+  renderLoading(btnSave, 'Сохранение...');
   editAvatar(avatar)
     .then((data) => {
       console.log(data);
+      profileImage.setAttribute('style', `background-image: url('${avatar}');`);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      renderSaveLoading(false, btnSave);
+      renderLoading(btnSave, 'Сохранить');
       formEditAvatar.reset();
       closePopup(popupTypEditAvatar);
     });
@@ -232,16 +238,29 @@ function handlePopupTypeImage(cardImage, cardTitle) {
 
 // Обработчик открытия попап у удаления карточки
 
-function handlePopupTypeDeleteCard(evt) {
+function handlePopupTypeDeleteCard(cardElem, cardId) {
   openPopup(popupTypeDeleteCard);
-  const btnDelete = evt.target.closest('.card__delete-button');
-  const formBtn = formDeleteCard.querySelector('.popup__button');
-  const card = btnDelete.closest('.card');
-  const cardId = card.dataset.cardId;
-  formBtn.dataset.currentId = cardId;
+  currentCardId = cardId;
+  cardElement = cardElem;
   formDeleteCard.addEventListener('submit', handleFormDeleteCardSubmit);
 }
 
+// Обработчик клика like карточки
+
+function handleLikeCard(checkStatusLike, cardData, counterLike, buttonLike) {
+  const status = checkStatusLike(cardData, userId);
+  !status
+    ? putLikeCard(cardData._id)
+        .then((res) => changeLike(res, counterLike, buttonLike, cardData, userId))
+        .catch((err) => {
+          console.log(`Ошибка: ${err}`);
+        })
+    : deleteLikeCard(cardData._id)
+        .then((res) => changeLike(res, counterLike, buttonLike, cardData, userId))
+        .catch((err) => {
+          console.log(`Ошибка: ${err}`);
+        });
+}
 // Вызов обработчиков модальных форм
 
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
