@@ -3,7 +3,7 @@
 [Ссылка на проект](https://vorobev1901.github.io/mesto-project-ff/ "Проектная работа 'Место'") <br />
 
 ### Запуск 
-<p> git pull https://github.com/Vorobev1901/mesto-project-ff.git </p> <br />
+git pull https://github.com/Vorobev1901/mesto-project-ff.git <br />
 cd mesto-project-ff <br />
 npm i <br />
 npm run dev <br />
