@@ -148,7 +148,7 @@ const handleFormDeleteCardSubmit = (evt) => {
       cardElement = null;
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     })
     .finally(() => {
       renderLoading(formBtn, 'Да');
@@ -168,13 +168,13 @@ function handleFormEditProfileSubmit(evt) {
     .then((data) => {
       profileTitle.textContent = data.name;
       profileDescription.textContent = data.about;
+      closePopup(popupTypeEditProfile);
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     })
     .finally(() => {
       renderLoading(btnSave, 'Сохранить');
-      closePopup(popupTypeEditProfile);
     });
 }
 
@@ -195,14 +195,14 @@ function handleFormNewCardSubmit(evt) {
       const card = data;
       const newCard = createCard(cardTemplate, card, handlePopupTypeImage, userId, handleLikeCard, handlePopupTypeDeleteCard);
       cardsContainer.prepend(newCard);
+      formNewCard.reset();
+      closePopup(popupTypeNewCard);
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     })
     .finally(() => {
       renderLoading(btnCreate, 'Создать');
-      formNewCard.reset();
-      closePopup(popupTypeNewCard);
     });
 }
 
@@ -216,14 +216,14 @@ function handleFormEditAvatarSubmit(evt) {
     .then((data) => {
       console.log(data);
       profileImage.setAttribute('style', `background-image: url('${avatar}');`);
+      formEditAvatar.reset();
+      closePopup(popupTypEditAvatar);
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     })
     .finally(() => {
       renderLoading(btnSave, 'Сохранить');
-      formEditAvatar.reset();
-      closePopup(popupTypEditAvatar);
     });
 }
 
