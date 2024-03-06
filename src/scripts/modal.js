@@ -1,3 +1,5 @@
+const escKey = 27; // Клавиша ESC
+
 // Закрытие по нажатию на close, esc, вне формы.
 
 function closeBtn(evt) {
@@ -8,7 +10,6 @@ function closeBtn(evt) {
 }
 
 function clickEsc(evt) {
-  const escKey = 27;
   if (evt.keyCode === escKey) {
     const popup = document.querySelector('.popup.popup_is-opened');
     closePopup(popup);
@@ -34,10 +35,8 @@ function openPopup(popup) {
 // Функция закрытия модального окна
 
 function closePopup(popup) {
-  if (popup.closest('.popup_type_new-card') || popup.closest('.popup_type_edit_avatar')) {
-    const formElement = popup.querySelector('.popup__form');
-    formElement.reset();
-  }
+  const formElement = popup.querySelector('.popup__form');
+  formElement.reset();
   popup.classList.remove('popup_is-opened');
   popup.removeEventListener('mousedown', clickOutsidePopup);
   popup.removeEventListener('click', closeBtn);

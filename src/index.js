@@ -142,7 +142,6 @@ const handleFormDeleteCardSubmit = (evt) => {
   deleteCardById(currentCardId)
     .then(() => {
       closePopup(popupTypeDeleteCard);
-      formDeleteCard.removeEventListener('submit', handleFormDeleteCardSubmit);
       deleteCard(cardElement);
       currentCardId = '';
       cardElement = null;
@@ -242,7 +241,6 @@ function handlePopupTypeDeleteCard(cardElem, cardId) {
   openPopup(popupTypeDeleteCard);
   currentCardId = cardId;
   cardElement = cardElem;
-  formDeleteCard.addEventListener('submit', handleFormDeleteCardSubmit);
 }
 
 // Обработчик клика like карточки
@@ -266,6 +264,7 @@ function handleLikeCard(checkStatusLike, cardData, counterLike, buttonLike) {
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 formEditProfile.addEventListener('submit', handleFormEditProfileSubmit);
 formEditAvatar.addEventListener('submit', handleFormEditAvatarSubmit);
+formDeleteCard.addEventListener('submit', handleFormDeleteCardSubmit);
 
 // Включение всех форм на странице
 
