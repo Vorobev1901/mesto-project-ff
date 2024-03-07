@@ -35,8 +35,6 @@ function openPopup(popup) {
 // Функция закрытия модального окна
 
 function closePopup(popup) {
-  const formElement = popup.querySelector('.popup__form');
-  formElement.reset();
   popup.classList.remove('popup_is-opened');
   popup.removeEventListener('mousedown', clickOutsidePopup);
   popup.removeEventListener('click', closeBtn);

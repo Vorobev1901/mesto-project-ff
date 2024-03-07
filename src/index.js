@@ -124,11 +124,13 @@ profileEditButton.addEventListener('click', () => {
 });
 
 addCardButton.addEventListener('click', () => {
+  formNewCard.reset();
   clearValidation(formNewCard, validationClearConfig);
   openPopup(popupTypeNewCard);
-});
+});  
 
 profileImage.addEventListener('click', () => {
+  formEditAvatar.reset();
   clearValidation(formEditAvatar, validationClearConfig);
   openPopup(popupTypEditAvatar);
 });
